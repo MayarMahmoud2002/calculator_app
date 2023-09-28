@@ -1,5 +1,7 @@
-import 'package:calculator_app/click_btn.dart';
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:math_expressions/math_expressions.dart';
+import 'click_btn.dart';
 
 class CalculatorScreen extends StatefulWidget {
 
@@ -68,19 +70,21 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   void initState() {
     super.initState();
     FirstRowNumbers = [
-      ClickBtn(title: 'C', clickBtnFunc:onTitleClick),
-      ClickBtn(title: '(', clickBtnFunc: onTitleClick),
-      ClickBtn(title: ')', clickBtnFunc: onTitleClick),
-      ClickBtn(title: 'x', clickBtnFunc: onTitleClick),
+
+
+      ClickBtn(title: 'C', clickBtnFunc:onClear),
+      ClickBtn(title: '(', clickBtnFunc: emptyClick),
+      ClickBtn(title: ')', clickBtnFunc: emptyClick),
+      ClickBtn(title: '*', clickBtnFunc: multiFunc),
 
 
 
     ];
     SecondRowNumbers =
     [
-      ClickBtn(title: '√', clickBtnFunc: onTitleClick),
-      ClickBtn(title: ' ', clickBtnFunc: onTitleClick),
-      ClickBtn(title: ' ', clickBtnFunc: onTitleClick),
+      ClickBtn(title: '√', clickBtnFunc: squareRootFunc),
+      ClickBtn(title: ' ', clickBtnFunc: emptyClick),
+      ClickBtn(title: ' ', clickBtnFunc: emptyClick),
       ClickBtn(title: '/', clickBtnFunc: onTitleClick),
 
 
@@ -92,7 +96,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ClickBtn(title: '7', clickBtnFunc: onTitleClick),
       ClickBtn(title: '8', clickBtnFunc: onTitleClick),
       ClickBtn(title: '9', clickBtnFunc: onTitleClick),
-      ClickBtn(title: '-', clickBtnFunc: onTitleClick),
+      ClickBtn(title: '-', clickBtnFunc: subtraction),
 
 
 
@@ -103,23 +107,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ClickBtn(title: '5', clickBtnFunc: onTitleClick),
           ClickBtn(title: '6', clickBtnFunc: onTitleClick),
           ClickBtn(title: '+', clickBtnFunc: onTitleClick),
-
-
-
         ];
     FifthRowNumbers =
     [
       ClickBtn(title: '1', clickBtnFunc: onTitleClick),
       ClickBtn(title: '2', clickBtnFunc: onTitleClick),
       ClickBtn(title: '3', clickBtnFunc: onTitleClick),
-
-
     ];
     SixthRowNumbers =
     [
-      ClickBtn(title: '.', clickBtnFunc: onTitleClick),
+      ClickBtn(title: '.', clickBtnFunc:onTitleClick ),
       ClickBtn(title: '0', clickBtnFunc: onTitleClick),
-      ClickBtn(title: 'x', clickBtnFunc: onTitleClick),
+      ClickBtn(title: 'x', clickBtnFunc: deleteButton),
 
 
     ];
@@ -137,7 +136,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         body: Container(
           height: double.infinity,
           decoration: BoxDecoration(
-
             gradient: LinearGradient(
               colors: [
                 Color.fromRGBO(144, 197, 236, 1.0),
@@ -419,12 +417,9 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                                             color: Color.fromRGBO(77, 158, 192, 1.0),
                                             borderRadius: BorderRadius.circular(66.0)),
                                         height: 145.0,
-                                        child: Center(
-                                          child: Text(
-                                            '=',
-                                            style: TextStyle(
-                                                color: Colors.white, fontSize: 27.0),
-                                          ),
+                                        child: ClickBtn(
+                                          title: '=',
+                                          clickBtnFunc:onEqualsPressed ,
                                         ),
                                       ),
                                     ),
@@ -447,14 +442,109 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
   void onTitleClick (title)
   {
-    setState(() {
-      textResult+= title;
+      textResult+=title;
+      print ('printed');
 
+    setState(() {
+    });
+  }
+
+  void subtraction(String title)
+  {
+    textResult +=  '-';
+    setState(() {
 
     });
 
+  }
+
+  void multiFunc (String title)
+  {
+    textResult += '*';
+    setState(() {
+
+    });
 
   }
+
+  void divFunc (String title)
+  {
+    textResult += '/';
+    setState(() {
+
+    });
+
+  }
+  void squareRootFunc(String title) {
+    print('Square root button pressed');
+
+      final parser = Parser();
+      final expression = parser.parse(textResult);
+      final context = ContextModel();
+      final result = expression.evaluate(EvaluationType.REAL, context);
+      final squareRoot = sqrt(result);
+      textResult = squareRoot.toStringAsFixed(2);
+      setState(() {
+      });
+
+
+  }
+
+
+  void onEqualsPressed(String title) {
+    try {
+      final parser = Parser();
+      final expression = parser.parse(textResult);
+      final context = ContextModel();
+      final double result = expression.evaluate(EvaluationType.REAL, context);
+
+      if (result % 1 == 0) {
+        setState(() {
+          textResult = result.toInt().toString();
+        });
+      } else {
+        setState(() {
+          textResult = result.toString();
+        });
+      }
+    } catch (e) {
+      setState(() {
+        textResult = 'Error';
+      });
+    }
+  }
+
+  void emptyClick(String title)
+  {
+
+  }
+
+
+  onClear(String title)
+  {
+    if (title == 'C')
+    {
+      textResult = '';
+
+    }
+    setState(() {
+
+    });
+
+  }
+  deleteButton(String title)
+  {
+    textResult = textResult.substring(0 , textResult.length-1);
+setState(() {
+
+});
+
+
+  }
+
+
+
+
 }
 
 
