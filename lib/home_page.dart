@@ -1,6 +1,8 @@
+import 'package:calculator_app/provider/calc_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:provider/provider.dart';
 import 'click_btn.dart';
 
 class CalculatorScreen extends StatefulWidget {
@@ -75,7 +77,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       ClickBtn(title: 'C', clickBtnFunc:onClear),
       ClickBtn(title: '(', clickBtnFunc: emptyClick),
       ClickBtn(title: ')', clickBtnFunc: emptyClick),
-      ClickBtn(title: '*', clickBtnFunc: multiFunc),
+      ClickBtn(title: 'x', clickBtnFunc: multiFunc),
 
 
 
@@ -118,7 +120,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     [
       ClickBtn(title: '.', clickBtnFunc:onTitleClick ),
       ClickBtn(title: '0', clickBtnFunc: onTitleClick),
-      ClickBtn(title: 'x', clickBtnFunc: deleteButton),
+      Stack(
+        children: [
+          ClickBtn(title: '', clickBtnFunc: deleteButton ),
+          Center(child: Icon(Icons.backspace_outlined,
+          color: Colors.white,
+          )),
+
+
+        ],
+      ),
 
 
     ];
@@ -130,6 +141,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final calcProvider = Provider.of<CalcProvider>(context);
+
     return SafeArea(
       child: Scaffold(
         // backgroundColor: Color.fromRGBO(16, 35, 51, 1.0),
@@ -137,10 +150,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           height: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(144, 197, 236, 1.0),
-                Color.fromRGBO(183, 179, 146, 1.0),
-              ],
+              colors: Provider.of<CalcProvider>(context).backgroundColors,              // [
+              //   Color.fromRGBO(144, 197, 236, 1.0),
+              //   Color.fromRGBO(183, 179, 146, 1.0),
+              // ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
@@ -158,11 +171,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       padding: const EdgeInsets.all(20.0),
                       child: Column(
                         children: [
-                          Text('${textResult}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text('${textResult}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30.0,
+                            ),
+                            ),
                           ),
 
 
@@ -194,14 +210,15 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                               inactiveTrackColor:
                               Color.fromRGBO(182, 205, 219, 1.0),
                               splashRadius: 50.0,
-                              value: forAndroid,
-                              onChanged: (value) =>
-                                  setState(() => forAndroid = value)),
+                              value: Provider.of<CalcProvider>(context).forAndroid,
+                              onChanged: (value) {
+                                Provider.of<CalcProvider>(context, listen: false).toggleAndroid(value);
+                              }),
                         ),
                         SizedBox(
                           width: 10.0,
                         ),
-                        Text ('Switch to Dark mode' ,
+                        Text ( getSwitchText(calcProvider.forAndroid),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12.0
@@ -541,6 +558,17 @@ setState(() {
 
 
   }
+  void onChangeSwitch (bool value)
+  {
+    setState(() {
+      forAndroid = value;
+    });
+
+  }
+  String getSwitchText(bool forAndroid) {
+    return forAndroid ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+  }
+
 
 
 
